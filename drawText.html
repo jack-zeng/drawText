@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+    <meta name="renderer" content="webkit">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+   <title>绘制文字</title>
+</head>
+<body>
+
+<style type="text/css">
+*{ touch-action: none; padding:0; margin:0; }
+body{overflow-x:hidden;}
+#img{height:100px; height:100px;}
+</style>
+<canvas id="drawText"></canvas>
+<button class="but" id="but">转换成图片</button>
+<img src="" alt="" id="img">    
+<script type="text/javascript">
+
+   class Whole{
+
+     /**
+      * _windowSize
+      * @return {oblect} 返回屏幕的宽度及高度
+      */
+      _windowSize(){
+         return{
+             width:window.screen.width,
+             height:window.screen.height
+         }
+      }
+       /**
+      * _getElement
+      * @return {documentObject} 返回dom对象
+      */
+      _getElement(dom){
+          return document.querySelector(dom)
+      }
+
+   }
+
+   /**
+    * DrawText
+    * @options object {dom:element,lineWidth:number,strokeStyle:color,
+    *                  width:number,height:number,callBack:function(){}
+    *                  }
+    */
+
+    class DrawText extends Whole{
+      constructor(options){ 
+         super();
+         let {width,height}=super._windowSize(),
+             def={dom:"#drawText",lineWidth:10,strokeStyle:"#ea8f32",
+                  width:width,height:height,callBack:function(){}},
+             opt=Object.assign({},def,options),
+             drawText=super._getElement(opt.dom),
+             body=super._getElement("body"),
+             context=drawText.getContext('2d'),
+             cx=0,
+             cy=0;
+             drawText.width=opt.width || width;
+             drawText.height=opt.height || height;        
+        /*清除微信中滑动显示背景*/
+         body.addEventListener('touchstart',function(event){
+             event.preventDefault();
+         },false);
+
+        /*绘图开始*/
+         drawText.addEventListener("touchstart",function(e){
+            let  pageX=e.touches[0].pageX,
+                 pageY=e.touches[0].pageY;
+                 cx=pageX;
+                 cy=pageY;
+                 context.beginPath();
+                 context.moveTo(cx,cy);
+         },false);
+
+       /*绘图移动路线*/
+        drawText.addEventListener("touchmove",function(e){
+            let pageX=e.touches[0].pageX,
+                pageY=e.touches[0].pageY;
+                cx=pageX;
+                cy=pageY;
+                context.lineWidth=opt.lineWidth;
+                context.lineTo(cx,cy);
+                context.strokeStyle=opt.strokeStyle;
+                context.stroke();
+       },false);
+       opt.callBack(drawText);//回调函数返回绘画对象方便以后扩展
+      }
+    }
+
+    new DrawText();
+
+    //canvas转换成图片
+    document.querySelector("#but").addEventListener("click",function(){
+           let  can=document.querySelector("#drawText");
+           let  img=document.querySelector("#img");
+                img.src=can.toDataURL("image/png");
+
+    },false) 
+
+
+   
+</script>
+  
+   
+</body>
+</html>
